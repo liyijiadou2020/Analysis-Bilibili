@@ -9,8 +9,9 @@
 
 import requests
 import time
+import random
 
-cur_uid = 100072
+cur_uid = 100000
 # end_uid = 100005
 end_uid = 100000000
 
@@ -21,14 +22,22 @@ url = 'https://api.bilibili.com/x/web-interface/card'  # 请求的URL
 SLEEP_TIME = 1
 
 if __name__ == '__main__':
+    send_headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
+        "Connection": "keep-alive",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.8"}
+
     while cur_uid < end_uid:
         # 请求参数，可以根据需要修改
         params = {'mid': str(cur_uid),
                   'photo': 'false'}
 
         # 发送GET请求
-        response = requests.get(url, params=params)
-        time.sleep(SLEEP_TIME)
+        response = requests.get(url, params=params, headers=send_headers)
+        sleep_time = random.random() * 3
+        time.sleep(sleep_time)
+        print(f'Sleep: {sleep_time}')
 
         # 检查请求是否成功
         if response.status_code == 200:

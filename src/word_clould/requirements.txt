@@ -1,8 +1,0 @@
-numpy
-matplotlib
-pillow
-wordcloud
-imageio
-jieba
-snownlp
-itchat
