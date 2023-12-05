@@ -19,7 +19,7 @@ json_file_path = './json_out'
 csv_file_path = './csv_out'
 sign_file_path = './sign_out'
 url = 'https://api.bilibili.com/x/web-interface/card'  # 请求的URL
-SLEEP_TIME = 0.02
+SLEEP_TIME = 1.02
 
 # 扩展的用户代理池
 user_agents = [
@@ -124,7 +124,7 @@ if __name__ == '__main__':
 
             print('\tSign 写入文件\n')
             sign = f'{mid}, {sign}'
-            sign_file_path.write(sign + "\n")
+            file_sign.write(sign + "\n")
 
             cur_uid += 1
 
