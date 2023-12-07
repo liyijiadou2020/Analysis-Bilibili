@@ -20,7 +20,7 @@ json_file_path = './json_out'
 csv_file_path = './csv_out'
 sign_file_path = './sign_out'
 url = 'https://api.bilibili.com/x/web-interface/card'  # 请求的URL
-SLEEP_TIME = 5
+SLEEP_TIME = 1.0
 
 # 扩展的用户代理池
 user_agents = [
