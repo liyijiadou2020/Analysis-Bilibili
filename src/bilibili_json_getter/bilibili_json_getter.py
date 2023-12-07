@@ -6,6 +6,7 @@
 # @Software: PyCharm
 # @Github  ：https://github.com/NekoSilverFox
 # -----------------------------------------
+import json
 import multiprocessing
 import requests
 import time
@@ -19,7 +20,7 @@ json_file_path = './json_out'
 csv_file_path = './csv_out'
 sign_file_path = './sign_out'
 url = 'https://api.bilibili.com/x/web-interface/card'  # 请求的URL
-SLEEP_TIME = 1.02
+SLEEP_TIME = 5
 
 # 扩展的用户代理池
 user_agents = [
@@ -114,12 +115,12 @@ if __name__ == '__main__':
                 f' follower: {follower}, like_num: {like_num} ...')
 
             print('\tJSON data 响应写入文件')
-            file_json.write(str(data) + "\n")
+            file_json.write(json.dumps(json_data) + "\n")
 
             print('\tCSV 写入文件')
-            res_str = (f'{mid}, {name}, {sex}, {face_nft}, {fans}, {friend}, {attention}, {archive_count}, {follower}, '
-                       f'{like_num}, {current_level}, {official_role}, {official_title}, {official_type}, {vip_type}, '
-                       f'{vip_status}, {vip_due_date}, {vip_label_theme}')
+            res_str = (f'{mid},{name},{sex},{face_nft},{fans},{friend},{attention},{archive_count},{follower},'
+                       f'{like_num},{current_level},{official_role},{official_title},{official_type},{vip_type},'
+                       f'{vip_status},{vip_due_date},{vip_label_theme}')
             file_csv.write(res_str + "\n")
 
             print('\tSign 写入文件\n')
