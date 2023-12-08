@@ -6,12 +6,13 @@
 # @Software: PyCharm
 # @Github  ：https://github.com/NekoSilverFox
 # -----------------------------------------
-
+import json
+import multiprocessing
 import requests
 import time
 import random
 
-cur_uid = 100000
+cur_uid = 100590
 # end_uid = 100005
 end_uid = 100000000
 
@@ -19,14 +20,36 @@ json_file_path = './json_out'
 csv_file_path = './csv_out'
 sign_file_path = './sign_out'
 url = 'https://api.bilibili.com/x/web-interface/card'  # 请求的URL
-SLEEP_TIME = 1
+SLEEP_TIME = 1.0
+
+# 扩展的用户代理池
+user_agents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.66',
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+    'Mozilla/5.0 (Linux; Android 10; SM-A505FN) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.86 Mobile Safari/537.36',
+    # 更多用户代理字符串
+]
 
 if __name__ == '__main__':
     send_headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
+        "User-Agent": random.choice(user_agents),
         "Connection": "keep-alive",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Language": "zh-CN,zh;q=0.8"}
+        "Accept-Language": "zh-CN,zh;q=0.8",
+        'Referer': 'https://t.bilibili.com/'
+    }
+
+    file_json = open(json_file_path, "a")
+    file_csv = open(csv_file_path, "a")
+    file_sign = open(sign_file_path, "a")
 
     while cur_uid < end_uid:
         # 请求参数，可以根据需要修改
@@ -35,9 +58,9 @@ if __name__ == '__main__':
 
         # 发送GET请求
         response = requests.get(url, params=params, headers=send_headers)
-        sleep_time = random.random() * 3
-        time.sleep(sleep_time)
-        print(f'Sleep: {sleep_time}')
+        # sleep_time = random.random() * 3
+        time.sleep(SLEEP_TIME)
+        # print(f'Sleep: {sleep_time}')
 
         # 检查请求是否成功
         if response.status_code == 200:
@@ -88,24 +111,21 @@ if __name__ == '__main__':
             vip_label_theme = data.get('card').get('vip').get('label').get('label_theme')  # 会员标签
 
             print(
-                f'正在抓取 uid: {cur_uid}\tJSON 响应码: {code}\n\tname: {name}, sex: {sex}, archive_count: {archive_count}, follower: {follower}, like_num: {like_num} ...')
+                f'正在抓取 uid: {cur_uid}\tJSON 响应码: {code}\n\tname: {name}, sex: {sex}, archive_count: {archive_count},'
+                f' follower: {follower}, like_num: {like_num} ...')
 
             print('\tJSON data 响应写入文件')
-            # with 语句用于自动关闭文件
-            with open(json_file_path, "a") as file:
-                file.write(str(data) + "\n")
+            file_json.write(json.dumps(json_data) + "\n")
 
             print('\tCSV 写入文件')
-            # with 语句用于自动关闭文件
-            with open(csv_file_path, "a") as file:
-                res_str = f'{mid}, {name}, {sex}, {face_nft}, {fans}, {friend}, {attention}, {archive_count}, {follower}, {like_num}, {current_level}, {official_role}, {official_title}, {official_type}, {vip_type}, {vip_status}, {vip_due_date}, {vip_label_theme}'
-                file.write(res_str + "\n")
+            res_str = (f'{mid},{name},{sex},{face_nft},{fans},{friend},{attention},{archive_count},{follower},'
+                       f'{like_num},{current_level},{official_role},{official_title},{official_type},{vip_type},'
+                       f'{vip_status},{vip_due_date},{vip_label_theme}')
+            file_csv.write(res_str + "\n")
 
             print('\tSign 写入文件\n')
-            # with 语句用于自动关闭文件
-            with open(sign_file_path, "a") as file:
-                sign = f'{mid}, {sign}'
-                file.write(sign + "\n")
+            sign = f'{mid}, {sign}'
+            file_sign.write(sign + "\n")
 
             cur_uid += 1
 
@@ -115,3 +135,6 @@ if __name__ == '__main__':
             print(f'[ERROR] 请求错误, 等待重试中，最后尝试抓取的 uid: {cur_uid}')
             time.sleep(SLEEP_TIME)
 
+    file_json.close()
+    file_csv.close()
+    file_sign.close()
